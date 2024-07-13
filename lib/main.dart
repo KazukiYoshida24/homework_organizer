@@ -2,13 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       home: HomeworkOrganizerScreen(),
     );
   }
@@ -24,6 +26,8 @@ class Homework {
 }
 
 class HomeworkOrganizerScreen extends StatefulWidget {
+  const HomeworkOrganizerScreen({super.key});
+
   @override
   _HomeworkOrganizerScreenState createState() =>
       _HomeworkOrganizerScreenState();
@@ -124,13 +128,21 @@ class _HomeworkOrganizerScreenState extends State<HomeworkOrganizerScreen> {
                   tileColor: index.isOdd ? oddItemColor : evenItemColor,
                   title: Text(homework.title),
                   subtitle: Text(DateFormat.yMMMd().format(homework.dueDate)),
-                  trailing: Checkbox(
-                    value: homework.isCompleted,
-                    onChanged: (value) {
-                      _toggleCompletion(index);
-                    },
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Checkbox(
+                        value: homework.isCompleted,
+                        onChanged: (value) {
+                          _toggleCompletion(index);
+                        },
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.delete),
+                        onPressed: () => _deleteHomework(index),
+                      ),
+                    ],
                   ),
-                  onLongPress: () => _deleteHomework(index),
                 );
               },
               onReorder: _reorderHomework,
