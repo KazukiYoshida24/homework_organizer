@@ -16,6 +16,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
+// 得意度３段階を設定
 enum Proficiency { high, medium, low }
 
 class Homework {
@@ -86,23 +87,50 @@ class _HomeworkOrganizerScreenState extends State<HomeworkOrganizerScreen> {
     });
   }
 
+// 期限順に並び替える
   void _sortHomeworkByDueDate() {
     setState(() {
-      _homeworkList.sort((a, b) => a.dueDate.compareTo(b.dueDate));
+      _homeworkList.sort((a, b) {
+        // まずは期限で比較
+        int dateComparison = a.dueDate.compareTo(b.dueDate);
+        if (dateComparison != 0) {
+          return dateComparison;
+        }
+        // 期限が同じ場合は得意度で比較
+        return a.proficiency.index.compareTo(b.proficiency.index);
+      });
     });
   }
 
+// 得意順に並び替える
   void _sortHomeworkByProficiency() {
     setState(() {
-      _homeworkList
-          .sort((a, b) => a.proficiency.index.compareTo(b.proficiency.index));
+      _homeworkList.sort((a, b) {
+        // まずは得意度で比較
+        int proficiencyComparison =
+            a.proficiency.index.compareTo(b.proficiency.index);
+        if (proficiencyComparison != 0) {
+          return proficiencyComparison;
+        }
+        // 得意度が同じ場合は期限で比較
+        return a.dueDate.compareTo(b.dueDate);
+      });
     });
   }
 
+// 苦手順に並び替える
   void _sortHomeworkByUnskilled() {
     setState(() {
-      _homeworkList
-          .sort((a, b) => b.proficiency.index.compareTo(a.proficiency.index));
+      _homeworkList.sort((a, b) {
+        // まずは苦手度で比較（逆順）
+        int unskilledComparison =
+            b.proficiency.index.compareTo(a.proficiency.index);
+        if (unskilledComparison != 0) {
+          return unskilledComparison;
+        }
+        // 苦手度が同じ場合は期限で比較
+        return a.dueDate.compareTo(b.dueDate);
+      });
     });
   }
 
