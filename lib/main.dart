@@ -86,6 +86,26 @@ class _HomeworkOrganizerScreenState extends State<HomeworkOrganizerScreen> {
     });
   }
 
+  void _sortHomeworkByDueDate() {
+    setState(() {
+      _homeworkList.sort((a, b) => a.dueDate.compareTo(b.dueDate));
+    });
+  }
+
+  void _sortHomeworkByProficiency() {
+    setState(() {
+      _homeworkList
+          .sort((a, b) => a.proficiency.index.compareTo(b.proficiency.index));
+    });
+  }
+
+  void _sortHomeworkByUnskilled() {
+    setState(() {
+      _homeworkList
+          .sort((a, b) => b.proficiency.index.compareTo(a.proficiency.index));
+    });
+  }
+
   String _proficiencyToString(Proficiency proficiency) {
     switch (proficiency) {
       case Proficiency.high:
@@ -114,6 +134,20 @@ class _HomeworkOrganizerScreenState extends State<HomeworkOrganizerScreen> {
       appBar: AppBar(
         title: const Text('宿題リスト'),
         backgroundColor: Colors.blue.withOpacity(0.5),
+        actions: [
+          TextButton(
+            onPressed: _sortHomeworkByDueDate,
+            child: const Text('期限順'),
+          ),
+          TextButton(
+            onPressed: _sortHomeworkByProficiency,
+            child: const Text('得意順'),
+          ),
+          TextButton(
+            onPressed: _sortHomeworkByUnskilled,
+            child: const Text('苦手順'),
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -219,7 +253,7 @@ class _HomeworkOrganizerScreenState extends State<HomeworkOrganizerScreen> {
                   title: Text(homework.title), // 宿題のタイトルを表示
                   subtitle: Text(
                     '${DateFormat.yMMMd().format(homework.dueDate)} ${DateFormat.Hm().format(homework.dueDate)} - ${_proficiencyToString(homework.proficiency)}',
-                  ), // 宿題の期限と時間を表示
+                  ), // 宿題の期限と得意度を表示
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min, // 子要素が必要な最小の幅で配置される
                     children: [
