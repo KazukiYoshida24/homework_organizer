@@ -149,10 +149,6 @@ class _HomeworkOrganizerScreenState extends State<HomeworkOrganizerScreen> {
                     }
                   },
                 ),
-                ElevatedButton(
-                  onPressed: _addHomework,
-                  child: const Text('宿題の追加'),
-                ),
               ],
             ),
           ),
@@ -176,9 +172,15 @@ class _HomeworkOrganizerScreenState extends State<HomeworkOrganizerScreen> {
                     );
                   }).toList(),
                 ),
+                const Spacer(), // 可変スペースを追加して右端に追加ボタンを寄せる
+                ElevatedButton(
+                  onPressed: _addHomework,
+                  child: const Text('宿題の追加'),
+                ),
               ],
             ),
           ),
+
           // リストビューの作成
           // Expandedにより、残りのスクリーン領域をすべてリストビューが占有
           Expanded(
