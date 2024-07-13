@@ -16,16 +16,20 @@ class MyApp extends StatelessWidget {
   }
 }
 
+enum Proficiency { high, medium, low }
+
 class Homework {
   String title; // 宿題のタイトルを保持する変数
   DateTime dueDate; // 宿題の期限を保持する変数
   bool isCompleted; // 宿題が完了したかどうかを示す変数
+  Proficiency proficiency; // 宿題の得意度を保持する変数
 
-  Homework(
-      {required this.title, // タイトルは必須の引数
-      required this.dueDate, // 期限は必須の引数
-      this.isCompleted = false // 完了チェックボックスはデフォルトでfalse
-      });
+  Homework({
+    required this.title, // タイトルは必須の引数
+    required this.dueDate, // 期限は必須の引数
+    this.isCompleted = false, // 完了チェックボックスはデフォルトでfalse
+    this.proficiency = Proficiency.medium, // 得意度はデフォルトで「普通」
+  });
 }
 
 // StatefulWidgetを継承
@@ -38,24 +42,22 @@ class HomeworkOrganizerScreen extends StatefulWidget {
 }
 
 class _HomeworkOrganizerScreenState extends State<HomeworkOrganizerScreen> {
-  // テキスト入力フィールド (TextField) の内容を管理するためのコントローラ
-  final TextEditingController _titleController = TextEditingController();
-  // 日付選択ダイアログから選択された日付を保持するための変数
-  DateTime _selectedDate = DateTime.now(); // 初期値として現在の日時を入れる
-  // オブジェクトを格納するリスト。アプリで追加された宿題の情報を管理し、表示するためのデータ構造
-  final List<Homework> _homeworkList = []; // 初期値として空のリスト
+  final TextEditingController _titleController =
+      TextEditingController(); // テキスト入力フィールドの内容を管理するためのコントローラ
+  DateTime _selectedDate = DateTime.now(); // 日付選択ダイアログから選択された日付を保持するための変数
+  Proficiency _selectedProficiency = Proficiency.medium; // 得意度の選択値を保持するための変数
+  final List<Homework> _homeworkList = []; // 宿題オブジェクトを格納するリスト
 
   void _addHomework() {
     setState(() {
-      // 入力されたタイトルと選択された日付で新しい宿題を作成する
+      // 入力されたタイトル、選択された日付、得意度で新しい宿題を作成する
       final homework = Homework(
         title: _titleController.text, // テキストフィールドの入力内容を取得
         dueDate: _selectedDate, // 日付選択ダイアログで選択された日付を設定
+        proficiency: _selectedProficiency, // 選択された得意度を設定
       );
-      // 宿題リストに新しい宿題を追加する
-      _homeworkList.add(homework);
-      // 入力フィールドをクリアする
-      _titleController.clear();
+      _homeworkList.add(homework); // 宿題リストに新しい宿題を追加する
+      _titleController.clear(); // 入力フィールドをクリアする
     });
   }
 
@@ -68,13 +70,12 @@ class _HomeworkOrganizerScreenState extends State<HomeworkOrganizerScreen> {
 
   void _deleteHomework(int index) {
     setState(() {
-      // 宿題リストの削除
+      // 宿題リストから指定された宿題を削除する
       _homeworkList.removeAt(index);
     });
   }
 
   void _reorderHomework(int oldIndex, int newIndex) {
-    // 並び替え時のロジックは公式にも記載があり、あまり考える必要はない。
     setState(() {
       // 新しい位置が古い位置よりも後ろにある場合、インデックスを調整する
       if (newIndex > oldIndex) {
@@ -84,6 +85,28 @@ class _HomeworkOrganizerScreenState extends State<HomeworkOrganizerScreen> {
       final item = _homeworkList.removeAt(oldIndex);
       _homeworkList.insert(newIndex, item);
     });
+  }
+
+  String _proficiencyToString(Proficiency proficiency) {
+    switch (proficiency) {
+      case Proficiency.high:
+        return "得意";
+      case Proficiency.medium:
+        return "普通";
+      case Proficiency.low:
+        return "苦手";
+    }
+  }
+
+  Color _proficiencyToColor(Proficiency proficiency) {
+    switch (proficiency) {
+      case Proficiency.high:
+        return Colors.green.withOpacity(0.2);
+      case Proficiency.medium:
+        return Colors.orange.withOpacity(0.2);
+      case Proficiency.low:
+        return Colors.red.withOpacity(0.2);
+    }
   }
 
   @override
@@ -101,7 +124,7 @@ class _HomeworkOrganizerScreenState extends State<HomeworkOrganizerScreen> {
               children: [
                 Expanded(
                   child: TextField(
-                    controller: _titleController, // 上で定義した
+                    controller: _titleController, // 上で定義したコントローラを指定
                     decoration: const InputDecoration(
                         labelText: '教科・内容をここに入力'), // 入力フィールドの装飾やラベルを設定
                   ),
@@ -133,10 +156,33 @@ class _HomeworkOrganizerScreenState extends State<HomeworkOrganizerScreen> {
               ],
             ),
           ),
+          Padding(
+            padding: const EdgeInsets.all(18.0),
+            child: Row(
+              children: [
+                const Text('得意度:'),
+                const SizedBox(width: 10),
+                DropdownButton<Proficiency>(
+                  value: _selectedProficiency,
+                  onChanged: (Proficiency? newValue) {
+                    setState(() {
+                      _selectedProficiency = newValue!;
+                    });
+                  },
+                  items: Proficiency.values.map((Proficiency proficiency) {
+                    return DropdownMenuItem<Proficiency>(
+                      value: proficiency,
+                      child: Text(_proficiencyToString(proficiency)),
+                    );
+                  }).toList(),
+                ),
+              ],
+            ),
+          ),
           // リストビューの作成
           // Expandedにより、残りのスクリーン領域をすべてリストビューが占有
           Expanded(
-            //  ユーザーが項目をドラッグして並べ替えできるリストビューを構築するためのウィジェット。builder メソッドを使用して、動的にリスト項目を作成
+            // ユーザーが項目をドラッグして並べ替えできるリストビューを構築するためのウィジェット。builder メソッドを使用して、動的にリスト項目を作成
             child: ReorderableListView.builder(
               padding: const EdgeInsets.symmetric(horizontal: 40),
               // リストビューに表示するアイテムの数を指定。ここでは _homeworkList の要素数を設定
@@ -145,22 +191,20 @@ class _HomeworkOrganizerScreenState extends State<HomeworkOrganizerScreen> {
               itemBuilder: (context, index) {
                 // _homeworkList リストから、指定された index に対応する宿題オブジェクトを取得
                 final homework = _homeworkList[index];
-                // 宿題リストに付ける色を設定
-                final Color oddItemColor = Colors.blue.withOpacity(0.05);
-                final Color evenItemColor = Colors.blue.withOpacity(0.15);
 
                 return ListTile(
-                  key: ValueKey(homework), // リスト項目を一意に識別するためのキー
+                  key: ValueKey(index), // リスト項目を一意に識別するためのキー
                   // リスト項目の背景色を奇数・偶数で交互に設定。 '?'は三項演算子。true の場合には oddItemColor, false の場合には evenItemColor を選択
-                  tileColor: index.isOdd ? oddItemColor : evenItemColor,
+                  tileColor: _proficiencyToColor(homework.proficiency),
                   // ドラッグするためのウィジェット
                   leading: ReorderableDragStartListener(
                     index: index,
                     child: const Icon(Icons.drag_handle), // ドラッグハンドルのアイコン
                   ),
                   title: Text(homework.title), // 宿題のタイトルを表示
-                  subtitle: Text(DateFormat.yMMMd()
-                      .format(homework.dueDate)), // 宿題の期限を表示（日付をフォーマットして表示）
+                  subtitle: Text(
+                    '${DateFormat.yMMMd().format(homework.dueDate)} - ${_proficiencyToString(homework.proficiency)}',
+                  ), // 宿題の期限を表示（日付をフォーマットして表示）と得意度を表示
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min, // 子要素が必要な最小の幅で配置される
                     children: [
@@ -168,20 +212,19 @@ class _HomeworkOrganizerScreenState extends State<HomeworkOrganizerScreen> {
                         value: homework.isCompleted, // チェックボックスの初期値に設定
                         onChanged: (value) {
                           // 上で定義
-                          _toggleCompletion(
-                              index); // チェックボックスの状態が変更されたときの処理を呼び出す
+                          _toggleCompletion(index); // チェックボックスが押されたときの処理を設定
                         },
                       ),
                       IconButton(
-                        icon: const Icon(Icons.delete), // 削除アイコンボタン
-                        onPressed: () =>
-                            _deleteHomework(index), // 削除アイコンボタンが押されたときの処理
+                        icon: const Icon(Icons.delete), // ゴミ箱のアイコンを表示
+                        onPressed: () => _deleteHomework(index), // 削除処理を実行
                       ),
                     ],
                   ),
                 );
               },
-              onReorder: _reorderHomework, // 項目の並べ替えが行われたときの処理を指定
+              // リスト項目が並び替えられたときに呼び出されるコールバック関数
+              onReorder: _reorderHomework, // 上で定義
             ),
           ),
         ],
