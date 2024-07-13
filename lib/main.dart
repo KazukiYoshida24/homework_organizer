@@ -101,11 +101,11 @@ class _HomeworkOrganizerScreenState extends State<HomeworkOrganizerScreen> {
   Color _proficiencyToColor(Proficiency proficiency) {
     switch (proficiency) {
       case Proficiency.high:
-        return Colors.green.withOpacity(0.2);
+        return Colors.green.withOpacity(0.3);
       case Proficiency.medium:
-        return Colors.orange.withOpacity(0.2);
+        return Colors.orange.withOpacity(0.3);
       case Proficiency.low:
-        return Colors.red.withOpacity(0.2);
+        return Colors.red.withOpacity(0.3);
     }
   }
 
