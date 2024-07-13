@@ -6,7 +6,7 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -32,9 +32,8 @@ class Homework {
   });
 }
 
-// StatefulWidgetを継承
 class HomeworkOrganizerScreen extends StatefulWidget {
-  const HomeworkOrganizerScreen({super.key});
+  const HomeworkOrganizerScreen({Key? key}) : super(key: key);
 
   @override
   _HomeworkOrganizerScreenState createState() =>
@@ -44,7 +43,7 @@ class HomeworkOrganizerScreen extends StatefulWidget {
 class _HomeworkOrganizerScreenState extends State<HomeworkOrganizerScreen> {
   final TextEditingController _titleController =
       TextEditingController(); // テキスト入力フィールドの内容を管理するためのコントローラ
-  DateTime _selectedDate = DateTime.now(); // 日付選択ダイアログから選択された日付を保持するための変数
+  DateTime _selectedDateTime = DateTime.now(); // 日付と時間を保持するための変数。初期値は現在時刻
   Proficiency _selectedProficiency = Proficiency.medium; // 得意度の選択値を保持するための変数
   final List<Homework> _homeworkList = []; // 宿題オブジェクトを格納するリスト
 
@@ -53,7 +52,7 @@ class _HomeworkOrganizerScreenState extends State<HomeworkOrganizerScreen> {
       // 入力されたタイトル、選択された日付、得意度で新しい宿題を作成する
       final homework = Homework(
         title: _titleController.text, // テキストフィールドの入力内容を取得
-        dueDate: _selectedDate, // 日付選択ダイアログで選択された日付を設定
+        dueDate: _selectedDateTime, // 日付選択ダイアログで選択された日付を設定
         proficiency: _selectedProficiency, // 選択された得意度を設定
       );
       _homeworkList.add(homework); // 宿題リストに新しい宿題を追加する
@@ -133,19 +132,33 @@ class _HomeworkOrganizerScreenState extends State<HomeworkOrganizerScreen> {
                   icon: const Icon(Icons.calendar_today), // アイコンとしてカレンダーアイコンを指定
                   onPressed: () async {
                     // ボタンが押されたときの処理を設定（非同期）
-                    final DateTime? pickedDate = await showDatePicker(
+                    final DateTime? pickedDateTime = await showDatePicker(
                       context:
                           context, // BuildContext を指定して、DatePicker を表示するためのコンテキストを提供
-                      initialDate: DateTime.now(), // 初期選択日付として現在の日付を指定
+                      initialDate: _selectedDateTime, // 初期選択日付として現在の日付を指定
                       firstDate: DateTime(2024), // 最初の日付
                       lastDate: DateTime(2100), // 最後の日付
                     );
 
-                    if (pickedDate != null) {
+                    if (pickedDateTime != null) {
                       // 日付が選択された場合の処理
-                      setState(() {
-                        _selectedDate = pickedDate; // 上で定義した変数を更新
-                      });
+                      final TimeOfDay? pickedTime = await showTimePicker(
+                        context: context,
+                        initialTime: TimeOfDay.fromDateTime(_selectedDateTime),
+                      );
+
+                      if (pickedTime != null) {
+                        // 時間が選択された場合の処理
+                        setState(() {
+                          _selectedDateTime = DateTime(
+                            pickedDateTime.year,
+                            pickedDateTime.month,
+                            pickedDateTime.day,
+                            pickedTime.hour,
+                            pickedTime.minute,
+                          );
+                        });
+                      }
                     }
                   },
                 ),
@@ -205,8 +218,8 @@ class _HomeworkOrganizerScreenState extends State<HomeworkOrganizerScreen> {
                   ),
                   title: Text(homework.title), // 宿題のタイトルを表示
                   subtitle: Text(
-                    '${DateFormat.yMMMd().format(homework.dueDate)} - ${_proficiencyToString(homework.proficiency)}',
-                  ), // 宿題の期限を表示（日付をフォーマットして表示）と得意度を表示
+                    '${DateFormat.yMMMd().format(homework.dueDate)} ${DateFormat.Hm().format(homework.dueDate)} - ${_proficiencyToString(homework.proficiency)}',
+                  ), // 宿題の期限と時間を表示
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min, // 子要素が必要な最小の幅で配置される
                     children: [
