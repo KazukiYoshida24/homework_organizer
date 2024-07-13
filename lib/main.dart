@@ -108,6 +108,7 @@ class _HomeworkOrganizerScreenState extends State<HomeworkOrganizerScreen> {
       );
       _homeworkList.add(homework); // 宿題リストに新しい宿題を追加する
       _titleController.clear(); // 入力フィールドをクリアする
+      _saveHomeworkList(); // 宿題が追加されたら保存する
     });
   }
 
