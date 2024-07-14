@@ -63,19 +63,19 @@ class HomeworkOrganizerScreen extends StatefulWidget {
 }
 
 class _HomeworkOrganizerScreenState extends State<HomeworkOrganizerScreen> {
-  List<Homework> get _expiredHomeworkList {
-    final now = DateTime.now();
-    return _homeworkList
-        .where((homework) => homework.dueDate.isBefore(now))
-        .toList();
-  }
+  // List<Homework> get _expiredHomeworkList {
+  //   final now = DateTime.now();
+  //   return _homeworkList
+  //       .where((homework) => homework.dueDate.isBefore(now))
+  //       .toList();
+  // }
 
-  List<Homework> get _upcomingHomeworkList {
-    final now = DateTime.now();
-    return _homeworkList
-        .where((homework) => homework.dueDate.isAfter(now))
-        .toList();
-  }
+  // List<Homework> get _upcomingHomeworkList {
+  //   final now = DateTime.now();
+  //   return _homeworkList
+  //       .where((homework) => homework.dueDate.isAfter(now))
+  //       .toList();
+  // }
 
   final TextEditingController _titleController =
       TextEditingController(); // テキスト入力フィールドの内容を管理するためのコントローラ
@@ -220,15 +220,25 @@ class _HomeworkOrganizerScreenState extends State<HomeworkOrganizerScreen> {
     }
   }
 
-  // 宿題リストに色を付ける関数
-  Color _proficiencyToColor(Proficiency proficiency) {
-    switch (proficiency) {
+// 宿題の得意度に応じた色を返す関数
+  Color _proficiencyToColor(Homework homework) {
+    final now = DateTime.now();
+    final daysUntilDue = homework.dueDate.difference(now).inDays;
+    // 期限までの日数に基づいて透明度を計算
+    double opacity = 0.2; // デフォルトの透明度
+    if (daysUntilDue <= 1) {
+      opacity = 0.5; // 期限が24時間以内の場合、色を強調表示する
+    }
+    // 宿題の得意度に応じて色を決定する
+    switch (homework.proficiency) {
       case Proficiency.high:
-        return Colors.green.withOpacity(0.2);
+        return Colors.green.withOpacity(opacity);
       case Proficiency.medium:
-        return Colors.orange.withOpacity(0.2);
+        return Colors.orange.withOpacity(opacity);
       case Proficiency.low:
-        return Colors.red.withOpacity(0.2);
+        return Colors.red.withOpacity(opacity);
+      default:
+        return Colors.grey.withOpacity(opacity);
     }
   }
 
@@ -364,7 +374,7 @@ class _HomeworkOrganizerScreenState extends State<HomeworkOrganizerScreen> {
                 return ListTile(
                   key: ValueKey(index), // リスト項目を一意に識別するためのキー
                   // リスト項目の背景色を奇数・偶数で交互に設定。 '?'は三項演算子。true の場合には oddItemColor, false の場合には evenItemColor を選択
-                  tileColor: _proficiencyToColor(homework.proficiency),
+                  tileColor: _proficiencyToColor(homework),
                   // ドラッグするためのウィジェット
                   leading: ReorderableDragStartListener(
                     index: index,
