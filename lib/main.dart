@@ -57,7 +57,6 @@ class Homework {
 
 class HomeworkOrganizerScreen extends StatefulWidget {
   const HomeworkOrganizerScreen({Key? key}) : super(key: key);
-
   @override
   _HomeworkOrganizerScreenState createState() =>
       _HomeworkOrganizerScreenState();
@@ -76,7 +75,15 @@ class _HomeworkOrganizerScreenState extends State<HomeworkOrganizerScreen> {
     _loadHomeworkList(); // アプリ起動時に宿題リストを読み込む
   }
 
-  // 宿題リストの読み込み
+  // 宿題リストの保存関数⇒アプリ閉じても消えないために作成
+  void _saveHomeworkList() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> stringList =
+        _homeworkList.map((homework) => json.encode(homework.toMap())).toList();
+    prefs.setStringList('homeworkList', stringList);
+  }
+
+  // 保存した宿題リストの読み込み関数
   void _loadHomeworkList() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     List<String>? stringList = prefs.getStringList('homeworkList');
@@ -90,14 +97,7 @@ class _HomeworkOrganizerScreenState extends State<HomeworkOrganizerScreen> {
     }
   }
 
-  // 宿題リストの保存⇒アプリ閉じても消えない
-  void _saveHomeworkList() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    List<String> stringList =
-        _homeworkList.map((homework) => json.encode(homework.toMap())).toList();
-    prefs.setStringList('homeworkList', stringList);
-  }
-
+  // 宿題リスト追加関数
   void _addHomework() {
     setState(() {
       // 入力されたタイトル、選択された日付、得意度で新しい宿題を作成する
@@ -112,6 +112,7 @@ class _HomeworkOrganizerScreenState extends State<HomeworkOrganizerScreen> {
     });
   }
 
+  // チェックボックスのオンオフ関数
   void _toggleCompletion(int index) {
     setState(() {
       // 指定された宿題の完了チェックボックスのオンオフを反転
@@ -120,6 +121,7 @@ class _HomeworkOrganizerScreenState extends State<HomeworkOrganizerScreen> {
     });
   }
 
+  // 宿題リスト削除関数
   void _deleteHomework(int index) {
     setState(() {
       // 宿題リストから指定された宿題を削除する
@@ -128,6 +130,7 @@ class _HomeworkOrganizerScreenState extends State<HomeworkOrganizerScreen> {
     });
   }
 
+  // 宿題リスト並び替え関数（公式のサンプルにロジックの記載があり。理解しなくて良い。）
   void _reorderHomework(int oldIndex, int newIndex) {
     setState(() {
       // 新しい位置が古い位置よりも後ろにある場合、インデックスを調整する
@@ -141,7 +144,7 @@ class _HomeworkOrganizerScreenState extends State<HomeworkOrganizerScreen> {
     });
   }
 
-  // 期限順に並び替える
+  // 期限順に並び替える関数
   void _sortHomeworkByDueDate() {
     setState(() {
       _homeworkList.sort((a, b) {
@@ -157,7 +160,7 @@ class _HomeworkOrganizerScreenState extends State<HomeworkOrganizerScreen> {
     });
   }
 
-// 得意順に並び替える
+// 得意順に並び替える関数
   void _sortHomeworkByProficiency() {
     setState(() {
       _homeworkList.sort((a, b) {
@@ -174,7 +177,7 @@ class _HomeworkOrganizerScreenState extends State<HomeworkOrganizerScreen> {
     });
   }
 
-  // 苦手順に並び替える
+  // 苦手順に並び替える関数
   void _sortHomeworkByUnskilled() {
     setState(() {
       _homeworkList.sort((a, b) {
@@ -191,6 +194,7 @@ class _HomeworkOrganizerScreenState extends State<HomeworkOrganizerScreen> {
     });
   }
 
+  // 得意度を日本語文字にしてるだけ
   String _proficiencyToString(Proficiency proficiency) {
     switch (proficiency) {
       case Proficiency.high:
@@ -202,6 +206,7 @@ class _HomeworkOrganizerScreenState extends State<HomeworkOrganizerScreen> {
     }
   }
 
+  // 得意度に色を付けてるだけ
   Color _proficiencyToColor(Proficiency proficiency) {
     switch (proficiency) {
       case Proficiency.high:
@@ -213,6 +218,7 @@ class _HomeworkOrganizerScreenState extends State<HomeworkOrganizerScreen> {
     }
   }
 
+  // ここからアプリ画面の作成
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -222,15 +228,27 @@ class _HomeworkOrganizerScreenState extends State<HomeworkOrganizerScreen> {
         actions: [
           TextButton(
             onPressed: _sortHomeworkByDueDate,
-            child: const Text('期限順'),
+            style: TextButton.styleFrom(
+              side: const BorderSide(color: Colors.blue, width: 3),
+              backgroundColor: const Color.fromARGB(255, 161, 235, 250),
+            ),
+            child: const Text('期限順', style: TextStyle(color: Colors.black)),
           ),
           TextButton(
             onPressed: _sortHomeworkByProficiency,
-            child: const Text('得意順'),
+            style: TextButton.styleFrom(
+              side: const BorderSide(color: Colors.blue, width: 3),
+              backgroundColor: const Color.fromARGB(255, 161, 235, 250),
+            ),
+            child: const Text('得意順', style: TextStyle(color: Colors.black)),
           ),
           TextButton(
             onPressed: _sortHomeworkByUnskilled,
-            child: const Text('苦手順'),
+            style: TextButton.styleFrom(
+              side: const BorderSide(color: Colors.blue, width: 3),
+              backgroundColor: const Color.fromARGB(255, 161, 235, 250),
+            ),
+            child: const Text('苦手順', style: TextStyle(color: Colors.black)),
           ),
         ],
       ),
