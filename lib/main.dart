@@ -63,6 +63,20 @@ class HomeworkOrganizerScreen extends StatefulWidget {
 }
 
 class _HomeworkOrganizerScreenState extends State<HomeworkOrganizerScreen> {
+  List<Homework> get _expiredHomeworkList {
+    final now = DateTime.now();
+    return _homeworkList
+        .where((homework) => homework.dueDate.isBefore(now))
+        .toList();
+  }
+
+  List<Homework> get _upcomingHomeworkList {
+    final now = DateTime.now();
+    return _homeworkList
+        .where((homework) => homework.dueDate.isAfter(now))
+        .toList();
+  }
+
   final TextEditingController _titleController =
       TextEditingController(); // テキスト入力フィールドの内容を管理するためのコントローラ
   DateTime _selectedDateTime = DateTime.now(); // 日付と時間を保持するための変数。初期値は現在時刻
@@ -206,15 +220,15 @@ class _HomeworkOrganizerScreenState extends State<HomeworkOrganizerScreen> {
     }
   }
 
-  // 得意度に色を付けてるだけ
+  // 宿題リストに色を付ける関数
   Color _proficiencyToColor(Proficiency proficiency) {
     switch (proficiency) {
       case Proficiency.high:
-        return Colors.green.withOpacity(0.3);
+        return Colors.green.withOpacity(0.2);
       case Proficiency.medium:
-        return Colors.orange.withOpacity(0.3);
+        return Colors.orange.withOpacity(0.2);
       case Proficiency.low:
-        return Colors.red.withOpacity(0.3);
+        return Colors.red.withOpacity(0.2);
     }
   }
 
