@@ -336,7 +336,7 @@ class _HomeworkOrganizerScreenState extends State<HomeworkOrganizerScreen> {
           Expanded(
             // ユーザーが項目をドラッグして並べ替えできるリストビューを構築するためのウィジェット。builder メソッドを使用して、動的にリスト項目を作成
             child: ReorderableListView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 40),
+              padding: const EdgeInsets.symmetric(horizontal: 10),
               // リストビューに表示するアイテムの数を指定。ここでは _homeworkList の要素数を設定
               itemCount: _homeworkList.length,
               // 各リストアイテムのビルド方法を定義するコールバック関数。この中で、ListTile を使用して各宿題を表示
@@ -355,7 +355,7 @@ class _HomeworkOrganizerScreenState extends State<HomeworkOrganizerScreen> {
                   ),
                   title: Text(homework.title), // 宿題のタイトルを表示
                   subtitle: Text(
-                    '${DateFormat.yMMMd().format(homework.dueDate)} ${DateFormat.Hm().format(homework.dueDate)} - ${_proficiencyToString(homework.proficiency)}',
+                    '${DateFormat('yyyy-MM-dd HH:mm').format(homework.dueDate)} - ${_proficiencyToString(homework.proficiency)}',
                   ), // 宿題の期限と得意度を表示
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min, // 子要素が必要な最小の幅で配置される
