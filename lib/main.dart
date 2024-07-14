@@ -223,7 +223,7 @@ class _HomeworkOrganizerScreenState extends State<HomeworkOrganizerScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('宿題リスト'),
+        title: const Text('宿題リスト-Demo'),
         backgroundColor: Colors.blue.withOpacity(0.5),
         actions: [
           TextButton(
@@ -369,7 +369,33 @@ class _HomeworkOrganizerScreenState extends State<HomeworkOrganizerScreen> {
                       ),
                       IconButton(
                         icon: const Icon(Icons.delete), // ゴミ箱のアイコンを表示
-                        onPressed: () => _deleteHomework(index), // 削除処理を実行
+                        onPressed: () {
+                          // 確認ダイアログをここに追加する
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: const Text("削除の確認"),
+                                content: const Text("この宿題を削除しますか？"),
+                                actions: [
+                                  TextButton(
+                                    child: const Text("キャンセル"),
+                                    onPressed: () {
+                                      Navigator.of(context).pop(); // ダイアログを閉じる
+                                    },
+                                  ),
+                                  TextButton(
+                                    child: const Text("削除"),
+                                    onPressed: () {
+                                      _deleteHomework(index); // 宿題を削除する関数を呼び出し
+                                      Navigator.of(context).pop(); // ダイアログを閉じる
+                                    },
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        },
                       ),
                     ],
                   ),
