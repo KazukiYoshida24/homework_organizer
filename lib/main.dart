@@ -223,7 +223,10 @@ class _HomeworkOrganizerScreenState extends State<HomeworkOrganizerScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('宿題リスト-Demo'),
+        title: const Text(
+          '宿題リスト-Demo',
+          style: TextStyle(fontSize: 20), // フォントサイズを調整
+        ),
         backgroundColor: Colors.blue.withOpacity(0.5),
         actions: [
           TextButton(
